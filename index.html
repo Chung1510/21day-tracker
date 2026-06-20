@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>21-Day Tracker 🌱</title>
+<style>
+:root {
+  --green:#1D9E75; --green-l:#E1F5EE; --green-d:#0F6E56;
+  --blue:#378ADD; --blue-l:#E6F1FB;
+  --purple:#534AB7; --purple-l:#EEEDFE;
+  --coral:#D85A30; --coral-l:#FAECE7;
+  --pink:#D4537E; --pink-l:#FBEAF0;
+  --amber:#BA7517; --amber-l:#FAEEDA;
+  --bg:#ffffff; --bg2:#f7f7f5; --bg3:#f0efeb;
+  --text:#1a1a18; --text2:#5f5e5a; --text3:#888780;
+  --border:rgba(0,0,0,0.09); --border2:rgba(0,0,0,0.16);
+  --r:8px; --rl:12px; --rxl:16px;
+  --shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1c1c1a;--bg2:#242422;--bg3:#2a2a28;
+    --text:#f0efeb;--text2:#b4b2a9;--text3:#666460;
+    --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+    --green-l:#04342C;--blue-l:#042C53;--purple-l:#26215C;
+    --coral-l:#4A1B0C;--pink-l:#4B1528;--amber-l:#412402;
+    --shadow:0 1px 4px rgba(0,0,0,0.3);
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{font-size:16px;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;overscroll-behavior:none;}
+
+/* ── Page wrapper ── */
+.page{max-width:700px;margin:0 auto;padding:20px 14px 80px;}
+
+/* ── Hero ── */
+.hero{text-align:center;padding:18px 0 14px;}
+.hero h1{font-size:22px;font-weight:700;letter-spacing:-0.4px;}
+.hero .sub{font-size:13px;color:var(--text3);margin-top:3px;}
+.hero .dates{font-size:12px;color:var(--green);font-weight:600;margin-top:5px;}
+
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 0 18px;}
+@media(min-width:500px){.stats{grid-template-columns:repeat(4,1fr);}}
+.scard{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rl);padding:12px 14px;text-align:center;box-shadow:var(--shadow);}
+.scard .num{font-size:22px;font-weight:700;color:var(--text);}
+.scard .lbl{font-size:10px;color:var(--text3);margin-top:2px;letter-spacing:0.02em;}
+.scard.accent .num{color:var(--green);}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:6px;margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{flex-shrink:0;padding:8px 16px;border-radius:999px;border:0.5px solid var(--border2);background:var(--bg);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.tab-btn.active{background:var(--green);color:#fff;border-color:var(--green);}
+
+/* ── Day nav ── */
+.day-nav{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.nav-btn{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r);padding:8px 14px;cursor:pointer;font-size:15px;color:var(--text);min-width:40px;text-align:center;box-shadow:var(--shadow);}
+.nav-btn:active{opacity:.7;}
+.day-info{flex:1;min-width:0;}
+.day-title{font-size:17px;font-weight:700;color:var(--text);}
+.day-date{font-size:12px;color:var(--text3);margin-top:1px;}
+.today-btn{background:var(--green-l);color:var(--green);border:0.5px solid var(--green);border-radius:var(--r);padding:7px 12px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;}
+
+/* ── Progress bar ── */
+.prog-wrap{background:var(--bg3);border-radius:999px;height:7px;margin-bottom:6px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--green);border-radius:999px;transition:width .35s ease;}
+.prog-label{font-size:11px;color:var(--text3);text-align:right;margin-bottom:16px;}
+
+/* ── Section label ── */
+.sec-lbl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);margin:18px 0 8px 2px;}
+
+/* ── Task cards ── */
+.task-list{display:flex;flex-direction:column;gap:6px;}
+.task-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rl);padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .12s;box-shadow:var(--shadow);}
+.task-card:active{opacity:.8;}
+.task-card.done{opacity:.5;}
+.task-card.done .tname{text-decoration:line-through;}
+.tcb{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--border2);background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.task-card.done .tcb{background:var(--green);border-color:var(--green);}
+.tcb svg{display:none;}
+.task-card.done .tcb svg{display:block;}
+.ticon{font-size:17px;width:24px;text-align:center;flex-shrink:0;}
+.tname{font-size:14px;color:var(--text);flex:1;line-height:1.35;}
+.tbadge{font-size:10px;padding:3px 8px;border-radius:999px;font-weight:600;white-space:nowrap;flex-shrink:0;}
+.b-habit{background:var(--green-l);color:var(--green-d);}
+.b-course{background:var(--blue-l);color:var(--blue);}
+.b-listen{background:var(--purple-l);color:var(--purple);}
+
+/* ── Reward banner ── */
+.reward-banner{display:none;background:linear-gradient(135deg,#1D9E75,#0F6E56);border-radius:var(--rxl);padding:20px;text-align:center;margin:16px 0;color:#fff;animation:popIn .4s ease;}
+.reward-banner.show{display:block;}
+@keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.reward-emoji{font-size:44px;line-height:1;margin-bottom:8px;}
+.reward-title{font-size:18px;font-weight:700;margin-bottom:4px;}
+.reward-sub{font-size:13px;opacity:.85;}
+.reward-msg{font-size:15px;font-weight:600;margin-top:10px;background:rgba(255,255,255,.18);border-radius:var(--r);padding:8px 14px;display:inline-block;}
+
+/* ── Notes ── */
+.notes-wrap{margin-top:20px;}
+.notes-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.notes-header span{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);}
+.notes-saved{font-size:11px;color:var(--green);margin-left:auto;opacity:0;transition:opacity .3s;}
+.notes-saved.show{opacity:1;}
+.notes-box{width:100%;background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--rl);padding:12px 14px;font-size:14px;color:var(--text);font-family:inherit;resize:none;min-height:100px;line-height:1.6;box-shadow:var(--shadow);transition:border-color .2s;}
+.notes-box:focus{outline:none;border-color:var(--green);}
+.notes-box::placeholder{color:var(--text3);}
+.mood-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.mood-btn{font-size:18px;padding:6px 10px;border-radius:var(--r);border:0.5px solid var(--border2);background:var(--bg);cursor:pointer;transition:all .15s;line-height:1;}
+.mood-btn.active{border-color:var(--green);background:var(--green-l);transform:scale(1.15);}
+
+/* ── Calendar ── */
+.cal-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--rl);box-shadow:var(--shadow);}
+.cal-table{border-collapse:collapse;width:100%;min-width:820px;background:var(--bg);border-radius:var(--rl);}
+.cal-table th{padding:6px 3px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);border-bottom:0.5px solid var(--border);white-space:nowrap;}
+.cal-table th.hth{text-align:left;min-width:160px;padding-left:10px;}
+.cal-table td{padding:4px 2px;text-align:center;border-bottom:0.5px solid var(--border);vertical-align:middle;}
+.cal-table td.htd{text-align:left;padding:7px 10px;}
+.cal-table tr:last-child td{border-bottom:none;}
+.hrname{font-size:11px;color:var(--text);display:flex;align-items:center;gap:6px;}
+.cal-cb{width:15px;height:15px;accent-color:var(--green);cursor:pointer;}
+.tcol{background:rgba(29,158,117,0.08)!important;}
+.tth{color:var(--green)!important;font-weight:700!important;}
+.srow td{background:var(--bg2)!important;font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;padding:4px 10px!important;text-align:left!important;}
+
+/* ── Courses ── */
+.courses{display:grid;grid-template-columns:1fr;gap:10px;}
+@media(min-width:500px){.courses{grid-template-columns:repeat(2,1fr);}}
+.ccard{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rl);padding:14px 16px;box-shadow:var(--shadow);}
+.chead{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.cicon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.cname{font-size:13px;font-weight:600;color:var(--text);line-height:1.35;}
+.ccount{font-size:12px;color:var(--text3);margin-top:2px;}
+.cbar-bg{background:var(--bg3);border-radius:999px;height:5px;overflow:hidden;}
+.cbar-fill{height:100%;border-radius:999px;transition:width .3s;}
+.csched{font-size:10px;color:var(--text3);margin-top:6px;line-height:1.5;}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--text);color:var(--bg);border-radius:var(--r);padding:10px 20px;font-size:13px;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── Bottom btns ── */
+.footer-btns{display:flex;gap:8px;margin-top:24px;justify-content:flex-end;flex-wrap:wrap;}
+.btn-sm{font-size:12px;padding:8px 14px;border-radius:var(--r);border:0.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;box-shadow:var(--shadow);}
+.btn-sm:active{opacity:.7;}
+.btn-sm.danger{color:#A32D2D;border-color:#A32D2D;}
+
+/* ── Mobile bottom nav ── */
+@media(max-width:500px){
+  .tab-btn{font-size:12px;padding:7px 12px;}
+  .tname{font-size:13px;}
+  .day-title{font-size:16px;}
+}
+</style>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1D9E75">
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js');
+  });
+}
+</script>
+
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <h1>🌱 21-Day Growth Tracker</h1>
+    <div class="sub">Thói quen · Khóa học · Ghi chú</div>
+    <div class="dates">21/06/2026 → 11/07/2026</div>
+  </div>
+
+  <div class="stats">
+    <div class="scard accent"><div class="num" id="st-today">-</div><div class="lbl">Hôm nay</div></div>
+    <div class="scard"><div class="num" id="st-done">0</div><div class="lbl">Đã làm</div></div>
+    <div class="scard"><div class="num" id="st-pct">0%</div><div class="lbl">Tổng thể</div></div>
+    <div class="scard"><div class="num" id="st-streak">0🔥</div><div class="lbl">Streak</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('day')">📅 Hôm nay</button>
+    <button class="tab-btn" onclick="showTab('calendar')">🗓 21 ngày</button>
+    <button class="tab-btn" onclick="showTab('courses')">📚 Khóa học</button>
+    <button class="tab-btn" onclick="showTab('notes')">📝 Nhật ký</button>
+  </div>
+
+  <!-- DAY TAB -->
+  <div id="tab-day">
+    <div class="day-nav">
+      <button class="nav-btn" onclick="changeDay(-1)">◀</button>
+      <div class="day-info">
+        <div class="day-title" id="day-title">Ngày 1</div>
+        <div class="day-date" id="day-date"></div>
+      </div>
+      <button class="today-btn" onclick="goToday()">Hôm nay</button>
+      <button class="nav-btn" onclick="changeDay(1)">▶</button>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="day-bar" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-label">0 / 0 nhiệm vụ</div>
+
+    <!-- Reward -->
+    <div class="reward-banner" id="reward-banner">
+      <div class="reward-emoji" id="r-emoji">🏆</div>
+      <div class="reward-title">Xuất sắc!</div>
+      <div class="reward-sub">Bạn đã hoàn thành 100% nhiệm vụ ngày hôm nay</div>
+      <div class="reward-msg" id="r-msg"></div>
+    </div>
+
+    <div id="day-content"></div>
+
+    <!-- Daily note (quick) -->
+    <div class="notes-wrap">
+      <div class="notes-header">
+        <span>📝 Ghi chú ngày</span>
+        <span class="notes-saved" id="note-saved-day">Đã lưu ✓</span>
+      </div>
+      <div class="mood-row" id="mood-row"></div>
+      <textarea class="notes-box" id="note-input" placeholder="Nhận xét về ngày hôm nay... Bạn đã làm tốt điều gì? Cần cải thiện gì?" rows="4" oninput="saveNote(this.value)"></textarea>
+    </div>
+  </div>
+
+  <!-- CALENDAR TAB -->
+  <div id="tab-calendar" style="display:none">
+    <div class="cal-wrap"><table class="cal-table" id="cal-table"></table></div>
+  </div>
+
+  <!-- COURSES TAB -->
+  <div id="tab-courses" style="display:none">
+    <div class="sec-lbl">Tiến độ khóa học</div>
+    <div class="courses" id="courses-grid"></div>
+  </div>
+
+  <!-- NOTES TAB -->
+  <div id="tab-notes" style="display:none">
+    <div id="notes-list"></div>
+  </div>
+
+  <div class="footer-btns">
+    <button class="btn-sm danger" onclick="resetAll()">🔄 Đặt lại</button>
+    <button class="btn-sm" onclick="exportData()">💾 Xuất JSON</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════
+const START = new Date(2026,5,21);
+const DAYS  = 21;
+
+const REWARDS = [
+  {emoji:'🏆',msg:'Bạn là người chiến thắng của ngày hôm nay!'},
+  {emoji:'🌟',msg:'Một ngày hoàn hảo — tiếp tục nhé!'},
+  {emoji:'🔥',msg:'Không có gì ngăn được bạn!'},
+  {emoji:'💪',msg:'Kỷ luật hôm nay = Tự do ngày mai!'},
+  {emoji:'🦋',msg:'Bạn đang thay đổi mỗi ngày một ít!'},
+  {emoji:'🚀',msg:'100% — bạn đang bay lên rồi đó!'},
+  {emoji:'🎯',msg:'Chuẩn không cần chỉnh!'},
+  {emoji:'✨',msg:'Ngày này sẽ được nhớ mãi!'},
+];
+
+const MOODS = ['😊','😐','😔','💪','😴','🤩','😤','🥰'];
+
+const HABITS = [
+  {id:'wake',    icon:'🌅', name:'Dậy trước 8h sáng'},
+  {id:'nophone', icon:'📵', name:'1h không dùng điện thoại sau khi dậy'},
+  {id:'exercise',icon:'🏃', name:'Tập thể dục 30 phút'},
+  {id:'meditate',icon:'🧘', name:'Thiền 20 phút — Hít vào năng lượng, thở ra bình yên'},
+  {id:'read',    icon:'📖', name:'Đọc 10 trang sách'},
+  {id:'shadowing',icon:'🎙',name:'Shadowing 1 giờ'},
+  {id:'speaking',icon:'💬', name:'Luyện nói với ChatGPT 1 giờ'},
+  {id:'eat',     icon:'🍚', name:'Ăn đủ 2 bữa cơm'},
+  {id:'acupoint',icon:'🤲', name:'Bấm huyệt'},
+  {id:'skincare',icon:'✨', name:'Skincare đầy đủ các bước'},
+  {id:'gratitude',icon:'🙏',name:'Nói lời biết ơn'},
+];
+
+const COURSES = [
+  {id:'ba',      icon:'📋', name:'Khóa BA',                    total:3,  unit:'buổi',  color:'#378ADD', schedule:[1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0]},
+  {id:'testing', icon:'🧪', name:'Khóa Testing',               total:12, unit:'buổi',  color:'#D85A30', schedule:[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,1,1,1,0]},
+  {id:'sql',     icon:'🗄️', name:'Tester SQL',                 total:16, unit:'buổi',  color:'#534AB7', schedule:[1,1,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,1,1,1,0]},
+  {id:'listen1', icon:'🎧', name:'Get Ready for IELTS Listening',total:50,unit:'tracks',color:'#1D9E75', schedule:[3,3,2,3,2,3,2,2,3,2,3,2,3,2,2,2,2,2,2,2,1]},
+  {id:'listen2', icon:'🎵', name:'Listening for IELTS',         total:70, unit:'tracks',color:'#D4537E', schedule:[3,3,3,3,3,3,3,4,4,3,4,3,4,3,3,3,4,3,3,4,3]},
+  {id:'jira',    icon:'📌', name:'Khóa Jira',                  total:5,  unit:'buổi',  color:'#BA7517', schedule:[0,0,1,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0]},
+];
+
+// ════════════════════════════════════
+// STORAGE
+// ════════════════════════════════════
+function ls_get(k)   { try{return localStorage.getItem(k);}catch(e){return null;} }
+function ls_set(k,v) { try{localStorage.setItem(k,v);}catch(e){} }
+function ls_del(k)   { try{localStorage.removeItem(k);}catch(e){} }
+
+function getCheck(id,day) { return ls_get(`t21_${id}_${day}`) === '1'; }
+function setCheck(id,day,v){ ls_set(`t21_${id}_${day}`, v?'1':'0'); }
+function getNote(day)  { return ls_get(`t21_note_${day}`) || ''; }
+function setNote(day,v){ ls_set(`t21_note_${day}`, v); }
+function getMood(day)  { return ls_get(`t21_mood_${day}`) || ''; }
+function setMood(day,v){ ls_set(`t21_mood_${day}`, v); }
+
+// ════════════════════════════════════
+// UTILS
+// ════════════════════════════════════
+let currentDay = 0;
+
+function dayDate(i){ const d=new Date(START); d.setDate(d.getDate()+i); return d; }
+function todayIdx(){
+  const now=new Date();
+  for(let i=0;i<DAYS;i++) if(dayDate(i).toDateString()===now.toDateString()) return i;
+  return 0;
+}
+function fmtDate(d){
+  const W=['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'];
+  return `${W[d.getDay()]}, ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+}
+function fmtShort(d){
+  const W=['CN','T2','T3','T4','T5','T6','T7'];
+  return `${W[d.getDay()]}<br>${d.getDate()}/${d.getMonth()+1}`;
+}
+
+function getDayTasks(idx){
+  const tasks = HABITS.map(h=>({id:h.id,icon:h.icon,name:h.name,type:'habit'}));
+  COURSES.forEach(c=>{
+    const q=c.schedule[idx];
+    if(q>0) tasks.push({
+      id:`course_${c.id}`, icon:c.icon,
+      name: q>1 ? `${c.name} — ${q} ${c.unit}` : c.name,
+      type: c.unit==='tracks'?'listen':'course'
+    });
+  });
+  return tasks;
+}
+
+// ════════════════════════════════════
+// STATS
+// ════════════════════════════════════
+function calcStats(){
+  let done=0,possible=0;
+  for(let d=0;d<DAYS;d++){
+    getDayTasks(d).forEach(t=>{ possible++; if(getCheck(t.id,d)) done++; });
+  }
+  const ti=todayIdx(), tt=getDayTasks(ti);
+  const td=tt.filter(t=>getCheck(t.id,ti)).length;
+  document.getElementById('st-today').textContent=`${td}/${tt.length}`;
+  document.getElementById('st-done').textContent=done;
+  document.getElementById('st-pct').textContent=possible>0?Math.round(done/possible*100)+'%':'0%';
+  let streak=0;
+  for(let d=ti;d>=0;d--){
+    const t=getDayTasks(d);
+    if(t.length && t.every(x=>getCheck(x.id,d))) streak++; else break;
+  }
+  document.getElementById('st-streak').textContent=streak+(streak>0?'🔥':'');
+}
+
+// ════════════════════════════════════
+// REWARD
+// ════════════════════════════════════
+function checkReward(dayIdx){
+  const tasks=getDayTasks(dayIdx);
+  const allDone=tasks.length>0 && tasks.every(t=>getCheck(t.id,dayIdx));
+  const banner=document.getElementById('reward-banner');
+  if(allDone){
+    const r=REWARDS[dayIdx % REWARDS.length];
+    document.getElementById('r-emoji').textContent=r.emoji;
+    document.getElementById('r-msg').textContent=r.msg;
+    banner.classList.add('show');
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+// ════════════════════════════════════
+// DAY VIEW
+// ════════════════════════════════════
+function renderDay(idx){
+  const tasks=getDayTasks(idx);
+  const d=dayDate(idx);
+  document.getElementById('day-title').textContent=`Ngày ${idx+1}`;
+  document.getElementById('day-date').textContent=fmtDate(d);
+
+  const doneN=tasks.filter(t=>getCheck(t.id,idx)).length;
+  const pct=tasks.length?Math.round(doneN/tasks.length*100):0;
+  document.getElementById('day-bar').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`${doneN} / ${tasks.length} nhiệm vụ · ${pct}%`;
+
+  const habits=tasks.filter(t=>t.type==='habit');
+  const courses=tasks.filter(t=>t.type==='course'||t.type==='listen');
+  let html='';
+
+  if(habits.length){
+    html+='<div class="sec-lbl">✅ Thói quen hàng ngày</div><div class="task-list">';
+    habits.forEach(t=>{
+      const dn=getCheck(t.id,idx);
+      html+=taskCard(t,idx,dn,'b-habit','Thói quen');
+    });
+    html+='</div>';
+  }
+  if(courses.length){
+    html+='<div class="sec-lbl">📚 Học hôm nay</div><div class="task-list">';
+    courses.forEach(t=>{
+      const dn=getCheck(t.id,idx);
+      const bc=t.type==='listen'?'b-listen':'b-course';
+      const bl=t.type==='listen'?'Listening':'Khóa học';
+      html+=taskCard(t,idx,dn,bc,bl);
+    });
+    html+='</div>';
+  }
+
+  document.getElementById('day-content').innerHTML=html;
+
+  // note & mood
+  document.getElementById('note-input').value=getNote(idx);
+  renderMoods(idx);
+  checkReward(idx);
+  calcStats();
+}
+
+function taskCard(t,idx,dn,bc,bl){
+  return `<div class="task-card${dn?' done':''}" onclick="toggleTask('${t.id}',${idx},this)">
+    <div class="tcb"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="ticon">${t.icon}</div>
+    <div class="tname">${t.name}</div>
+    <span class="tbadge ${bc}">${bl}</span>
+  </div>`;
+}
+
+function toggleTask(id,idx,el){
+  const card=el.closest('.task-card');
+  const was=getCheck(id,idx);
+  setCheck(id,idx,!was);
+  card.classList.toggle('done',!was);
+  const tasks=getDayTasks(idx);
+  const dn=tasks.filter(t=>getCheck(t.id,idx)).length;
+  const pct=Math.round(dn/tasks.length*100);
+  document.getElementById('day-bar').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`${dn} / ${tasks.length} nhiệm vụ · ${pct}%`;
+  checkReward(idx);
+  calcStats();
+  if(document.getElementById('tab-courses').style.display!=='none') renderCourses();
+  if(!was && dn===tasks.length) showToast('🎉 Hoàn thành 100% ngày hôm nay!');
+  else showToast(!was?'✅ Xong!':'↩️ Bỏ đánh dấu');
+}
+
+function changeDay(d){ currentDay=Math.max(0,Math.min(DAYS-1,currentDay+d)); renderDay(currentDay); }
+function goToday(){ currentDay=todayIdx(); showTab('day'); renderDay(currentDay); }
+
+// ════════════════════════════════════
+// NOTES
+// ════════════════════════════════════
+let noteTimer=null;
+function saveNote(v){
+  setNote(currentDay,v);
+  const el=document.getElementById('note-saved-day');
+  el.classList.remove('show');
+  clearTimeout(noteTimer);
+  noteTimer=setTimeout(()=>{ el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2000); },600);
+}
+
+function renderMoods(idx){
+  const cur=getMood(idx);
+  const row=document.getElementById('mood-row');
+  if(!row) return;
+  row.innerHTML=MOODS.map(m=>`<button class="mood-btn${m===cur?' active':''}" onclick="pickMood('${m}',${idx},this)" title="${m}">${m}</button>`).join('');
+}
+function pickMood(m,idx,el){
+  setMood(idx,m);
+  document.querySelectorAll('#mood-row .mood-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  showToast('Mood: '+m);
+  if(document.getElementById('tab-notes').style.display!=='none') renderNotesTab();
+}
+
+function renderNotesTab(){
+  let html='';
+  let hasAny=false;
+  for(let d=DAYS-1;d>=0;d--){
+    const note=getNote(d), mood=getMood(d);
+    if(!note && !mood) continue;
+    hasAny=true;
+    const done=getDayTasks(d).filter(t=>getCheck(t.id,d)).length;
+    const total=getDayTasks(d).length;
+    const pct=total?Math.round(done/total*100):0;
+    html+=`<div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rl);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-size:13px;font-weight:700;color:var(--text)">Ngày ${d+1}</span>
+        <span style="font-size:11px;color:var(--text3)">${fmtDate(dayDate(d))}</span>
+        ${mood?`<span style="font-size:18px;margin-left:auto">${mood}</span>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <div style="flex:1;background:var(--bg3);border-radius:999px;height:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--green);border-radius:999px"></div></div>
+        <span style="font-size:11px;color:var(--green);font-weight:600">${done}/${total}</span>
+      </div>
+      ${note?`<div style="font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap">${escHtml(note)}</div>`:''}
+    </div>`;
+  }
+  if(!hasAny) html='<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:14px">Chưa có ghi chú nào.<br>Hãy viết nhật ký sau mỗi ngày nhé! 📝</div>';
+  document.getElementById('notes-list').innerHTML=html;
+}
+
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ════════════════════════════════════
+// CALENDAR
+// ════════════════════════════════════
+function renderCalendar(){
+  const ti=todayIdx();
+  const sections=[
+    {label:'📋 Thói quen', items:HABITS.map(h=>({id:h.id,icon:h.icon,name:h.name,sch:Array(DAYS).fill(1)}))},
+    {label:'📚 Khóa học & Listening', items:COURSES.map(c=>({id:`course_${c.id}`,icon:c.icon,name:c.name,sch:c.schedule}))},
+  ];
+  let html='<thead><tr><th class="hth">Nhiệm vụ</th>';
+  for(let d=0;d<DAYS;d++) html+=`<th class="${d===ti?'tth':''}" style="width:28px">${d+1}<br>${fmtShort(dayDate(d)).split('<br>')[0]}</th>`;
+  html+='<th style="min-width:32px">✓</th></tr></thead><tbody>';
+  sections.forEach(sec=>{
+    html+=`<tr class="srow"><td colspan="${DAYS+2}">${sec.label}</td></tr>`;
+    sec.items.forEach(item=>{
+      html+=`<tr><td class="htd"><div class="hrname"><span>${item.icon}</span><span>${item.name}</span></div></td>`;
+      let cnt=0;
+      for(let d=0;d<DAYS;d++){
+        const active=item.sch[d]>0;
+        const ck=active&&getCheck(item.id,d);
+        if(ck) cnt++;
+        html+=active
+          ? `<td class="${d===ti?'tcol':''}"><input type="checkbox" class="cal-cb" ${ck?'checked':''} onchange="calTog('${item.id}',${d},this)"></td>`
+          : `<td class="${d===ti?'tcol':''}" style="color:var(--border2);font-size:10px">·</td>`;
+      }
+      html+=`<td style="font-size:11px;color:var(--green);font-weight:600">${cnt}</td></tr>`;
+    });
+  });
+  html+='</tbody>';
+  document.getElementById('cal-table').innerHTML=html;
+}
+function calTog(id,d,cb){
+  setCheck(id,d,cb.checked);
+  calcStats();
+  if(d===currentDay) renderDay(currentDay);
+}
+
+// ════════════════════════════════════
+// COURSES
+// ════════════════════════════════════
+function renderCourses(){
+  document.getElementById('courses-grid').innerHTML=COURSES.map(c=>{
+    let done=0,total=0;
+    for(let d=0;d<DAYS;d++){
+      const q=c.schedule[d];
+      if(q>0){ total+=q; if(getCheck(`course_${c.id}`,d)) done+=q; }
+    }
+    const pct=total?Math.round(done/total*100):0;
+    const days=c.schedule.map((q,i)=>q>0?`N${i+1}${q>1?'('+q+')':''}`:'').filter(Boolean);
+    return `<div class="ccard">
+      <div class="chead"><span class="cicon">${c.icon}</span><div><div class="cname">${c.name}</div><div class="ccount">${done}/${total} ${c.unit} · ${pct}%</div></div></div>
+      <div class="cbar-bg"><div class="cbar-fill" style="width:${pct}%;background:${c.color}"></div></div>
+      <div class="csched">📅 ${days.slice(0,8).join(', ')}${days.length>8?'…':''}</div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════
+// TABS
+// ════════════════════════════════════
+function showTab(name){
+  ['day','calendar','courses','notes'].forEach(n=>{
+    document.getElementById('tab-'+n).style.display=n===name?'':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['day','calendar','courses','notes'][i]===name);
+  });
+  if(name==='calendar') renderCalendar();
+  if(name==='courses')  renderCourses();
+  if(name==='notes')    renderNotesTab();
+}
+
+// ════════════════════════════════════
+// MISC
+// ════════════════════════════════════
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+function resetAll(){
+  if(!confirm('Xóa toàn bộ dữ liệu? Không thể hoàn tác.')) return;
+  try{localStorage.clear();}catch(e){}
+  renderDay(currentDay); calcStats(); showToast('🔄 Đã đặt lại');
+}
+
+function exportData(){
+  const data={};
+  for(let d=0;d<DAYS;d++){
+    const k=`ngay_${d+1}`;
+    data[k]={tasks:{},note:getNote(d),mood:getMood(d)};
+    getDayTasks(d).forEach(t=>{ data[k].tasks[t.id]=getCheck(t.id,d); });
+  }
+  const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download='21day-tracker.json'; a.click();
+  showToast('💾 Đã xuất dữ liệu');
+}
+
+// ════════════════════════════════════
+// INIT
+// ════════════════════════════════════
+currentDay=todayIdx();
+renderDay(currentDay);
+calcStats();
+</script>
+</body>
+</html>
